@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Interactive Chat Widget</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Arial', sans-serif;
+      }
+
+      #interactive-chat {
+        display: none;
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 300px;
+        height: 400px;
+        border: 2px solid #4caf50;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      #chat-messages {
+        height: 300px;
+        overflow-y: scroll;
+        padding: 10px;
+      }
+
+      #user-input {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      #send-message-button {
+        width: 90%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #chat-toggle-icon, #close-chat-icon {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px;
+        color: white;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+
+      #chat-toggle-icon {
+        background-color: #4caf50;
+      }
+
+      #close-chat-icon {
+        font-size: 30px;
+        display: none;
+        right: 75px;
+        background-color: #e53935;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Interactive Chat Popup (hidden by default) -->
+    <div
+      id="interactive-chat"
+      style="
+        display: none;
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        width: 300px;
+        height: 400px;
+        border: 2px solid #4caf50;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      "
+    >
+      <div
+        id="chat-messages"
+        style="height: 300px; overflow-y: scroll; padding: 10px"
+      ></div>
+      <input
+        type="text"
+        id="user-input"
+        style="width: 80%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;"
+        placeholder="Enter your message"
+      />
+      <button id="send-message-button">Send</button>
+    </div>
+
+    <!-- Chat Widget Toggle Icon -->
+    <div
+      id="chat-toggle-icon"
+      style="
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px;
+        color: white;
+        cursor: pointer;
+        border-radius: 50%;
+        background-color: #4caf50;
+      "
+    >
+      Chat
+    </div>
+
+    <!-- Close Chat Icon -->
+    <div
+      id="close-chat-icon"
+      style="
+        font-size: 30px;
+        display: none;
+        right: 75px;
+        background-color: #e53935;
+        position: fixed;
+        bottom: 20px;
+        cursor: pointer;
+        border-radius: 50%;
+      "
+    >
+      ❎
+    </div>
+
+    <!-- Socket.IO -->
+    <script src="/socket.js/"></script>
+
+    <!-- Interactive Chat Widget Script -->
+    <script>
+      const socket = io();
+      let userAlias = prompt("Please enter your alias:");
+
+      // Open interactive chat on toggle icon click
+      document
+        .getElementById("chat-toggle-icon")
+        .addEventListener("click", () => {
+          document.getElementById("interactive-chat").style.display = "block";
+          document.getElementById("close-chat-icon").style.display = "block";
+          // Notify the server that the user has joined
+          socket.emit("join", { userAlias });
+        });
+
+      // Close interactive chat on close icon click
+      document
+        .getElementById("close-chat-icon")
+        .addEventListener("click", () => {
+          document.getElementById("interactive-chat").style.display = "none";
+          document.getElementById("close-chat-icon").style.display = "none";
+        });
+
+      // Receive messages
+      socket.on("message incoming", (messageData) => {
+        const { message, userAlias } = messageData;
+        console.log({ message });
+        const chatBox = document.getElementById("chat-messages");
+        chatBox.innerHTML += `<p style="padding:7px; background-color:#edebe8; border-radius:10px"><strong>${userAlias}:</strong> ${message}</p>`;
+        window.scrollTo(0, document.body.scrollHeight);
+      });
+
+      // Function to send a message
+      function sendMessage() {
+        const message = document.getElementById("user-input").value;
+        const chatBox = document.getElementById("chat-messages");
+        chatBox.innerHTML += `<p style="text-align:end; padding:7px; background-color:#b9fad9; border-radius:10px"><strong>${userAlias}:</strong> ${message}</p>`;
+        window.scrollTo(0, document.body.scrollHeight);
+        socket.emit("message outgoing", { userAlias, message });
+        document.getElementById("user-input").value = "";
+      }
+    </script>
+  </body>
+</html>
