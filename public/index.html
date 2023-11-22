@@ -2,180 +2,42 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Interactive Chat Widget</title>
-    <style>
-      body {
-        margin: 0;
-        font-family: 'Arial', sans-serif;
-      }
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
 
-      #interactive-chat {
-        display: none;
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        width: 300px;
-        height: 400px;
-        border: 2px solid #4caf50;
-        border-radius: 10px;
-        background-color: #fff;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      #chat-messages {
-        height: 300px;
-        overflow-y: scroll;
-        padding: 10px;
-      }
-
-      #user-input {
-        width: 80%;
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-      }
-
-      #send-message-button {
-        width: 90%;
-        padding: 10px;
-        background-color: #4caf50;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-      }
-
-      #chat-toggle-icon, #close-chat-icon {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 15px;
-        color: white;
-        cursor: pointer;
-        border-radius: 50%;
-      }
-
-      #chat-toggle-icon {
-        background-color: #4caf50;
-      }
-
-      #close-chat-icon {
-        font-size: 30px;
-        display: none;
-        right: 75px;
-        background-color: #e53935;
-      }
-    </style>
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
   </head>
   <body>
-    <!-- Interactive Chat Popup (hidden by default) -->
-    <div
-      id="interactive-chat"
-      style="
-        display: none;
-        position: fixed;
-        bottom: 80px;
-        right: 20px;
-        width: 300px;
-        height: 400px;
-        border: 2px solid #4caf50;
-        border-radius: 10px;
-        background-color: #fff;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      "
-    >
-      <div
-        id="chat-messages"
-        style="height: 300px; overflow-y: scroll; padding: 10px"
-      ></div>
-      <input
-        type="text"
-        id="user-input"
-        style="width: 80%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px;"
-        placeholder="Enter your message"
-      />
-      <button id="send-message-button">Send</button>
-    </div>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
 
-    <!-- Chat Widget Toggle Icon -->
-    <div
-      id="chat-toggle-icon"
-      style="
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 15px;
-        color: white;
-        cursor: pointer;
-        border-radius: 50%;
-        background-color: #4caf50;
-      "
-    >
-      Chat
-    </div>
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
 
-    <!-- Close Chat Icon -->
-    <div
-      id="close-chat-icon"
-      style="
-        font-size: 30px;
-        display: none;
-        right: 75px;
-        background-color: #e53935;
-        position: fixed;
-        bottom: 20px;
-        cursor: pointer;
-        border-radius: 50%;
-      "
-    >
-      ❎
-    </div>
-
-    <!-- Socket.IO -->
-    <script src="/socket.js/"></script>
-
-    <!-- Interactive Chat Widget Script -->
-    <script>
-      const socket = io();
-      let userAlias = prompt("Please enter your alias:");
-
-      // Open interactive chat on toggle icon click
-      document
-        .getElementById("chat-toggle-icon")
-        .addEventListener("click", () => {
-          document.getElementById("interactive-chat").style.display = "block";
-          document.getElementById("close-chat-icon").style.display = "block";
-          // Notify the server that the user has joined
-          socket.emit("join", { userAlias });
-        });
-
-      // Close interactive chat on close icon click
-      document
-        .getElementById("close-chat-icon")
-        .addEventListener("click", () => {
-          document.getElementById("interactive-chat").style.display = "none";
-          document.getElementById("close-chat-icon").style.display = "none";
-        });
-
-      // Receive messages
-      socket.on("message incoming", (messageData) => {
-        const { message, userAlias } = messageData;
-        console.log({ message });
-        const chatBox = document.getElementById("chat-messages");
-        chatBox.innerHTML += `<p style="padding:7px; background-color:#edebe8; border-radius:10px"><strong>${userAlias}:</strong> ${message}</p>`;
-        window.scrollTo(0, document.body.scrollHeight);
-      });
-
-      // Function to send a message
-      function sendMessage() {
-        const message = document.getElementById("user-input").value;
-        const chatBox = document.getElementById("chat-messages");
-        chatBox.innerHTML += `<p style="text-align:end; padding:7px; background-color:#b9fad9; border-radius:10px"><strong>${userAlias}:</strong> ${message}</p>`;
-        window.scrollTo(0, document.body.scrollHeight);
-        socket.emit("message outgoing", { userAlias, message });
-        document.getElementById("user-input").value = "";
-      }
-    </script>
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
   </body>
 </html>
